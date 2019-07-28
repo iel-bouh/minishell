@@ -6,7 +6,7 @@
 /*   By: iel-bouh <iel-bouh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/05 14:51:08 by iel-bouh          #+#    #+#             */
-/*   Updated: 2019/07/19 19:20:51 by iel-bouh         ###   ########.fr       */
+/*   Updated: 2019/07/28 19:37:50 by iel-bouh         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,11 +19,19 @@ int		main(int argc, char **argv, char **env)
 	t_env	*key_val;
 
 	key_val = NULL;
+	argv = NULL;
+	argc = 0;
 	signal(SIGINT, ft_ctl_c);
 	ft_env_var(env, &key_val);
-	ft_launch(env, key_val);
+	if (!ft_launch(key_val))
+	{
+		ft_putstr_fd("\033[0m", 1);
+		return (0);
+	}
 	ft_free_key(&key_val);
+	ft_putstr_fd("\033[0m", 1);
 	return (0);
+
 }
 
 void	ft_ctl_c(int sig)
@@ -31,37 +39,47 @@ void	ft_ctl_c(int sig)
 	signal(SIGINT, ft_ctl_c);
 	if (g_ctl != 2)
 	{
+		ft_putstr_fd("\033[1;33m", 1);
 		ft_putstr_fd("\n$", 1);
 		ft_putstr_fd(getcwd(NULL, 0), 1);
 		ft_putstr_fd("> ", 1);
+		ft_putstr_fd("\033[0;32m", 1);
 	}
 	g_ctl = 1;
+	sig = g_ctl;
 }
 
-int	ft_launch(char **env, t_env *key_val)
+int	ft_launch(t_env *key_val)
 {
 	char	*line;
 	char	**command;
-	char	**tmp1;
+	char	**cmd_tmp;
 	int		ch;
-	char 	**tmp;
 
 	while (1)
 	{
 		if (g_ctl == 0)
 		{
+			ft_putstr_fd("\033[1;33m", 1);
 			ft_putstr_fd("$", 1);
 			ft_putstr_fd(getcwd(NULL, 0), 1);
 			ft_putstr_fd("> ", 1);
+			ft_putstr_fd("\033[0;32m", 1);
 		}
-		ch = get_next_line(1, &line);
+		ch = get_next_line(1, &line); //freee it 
 		if (ch)
 		{
 			command = ft_strsplit(line, ';');
+			cmd_tmp = command;
 			while (*command)
 			{
-				if (!ft_parce_exec(*command++, &key_val, env))
+				if (!ft_parce_exec(*command++, &key_val))
+				{
+					ft_memdel((void **)&line);
+					while (*cmd_tmp)
+						free(*(cmd_tmp++));
 					return (0);
+				}
 			}
 		}
 		else
@@ -129,7 +147,7 @@ char	*ft_path_check(char **path, char *exec)
 	return (NULL);
 }
 
-int		ft_parce_exec(char *line, t_env **key_val, char **env)
+int		ft_parce_exec(char *line, t_env **key_val)
 {
 	pid_t	pid;
 	char	**tmp1;
@@ -148,22 +166,25 @@ int		ft_parce_exec(char *line, t_env **key_val, char **env)
 			perror("error: ");
 		if (pid == 0)
 		{
-			if ((path = ft_path_check(ft_path_split(
-					ft_value(*key_val, "PATH")), tmp1[0])))
+			if (!ft_strchr(tmp1[0], '/') &&
+					(path = ft_path_check(ft_path_split(
+						ft_value(*key_val, "PATH")), tmp1[0])))
 			{
 				tmp1[0] = ft_strjoin(path, tmp1[0]);
 				if (access(tmp1[0], X_OK) == 0)
-					execve(tmp1[0], tmp1, env);
+				{
+					execve(tmp1[0], tmp1, ft_env_change(*key_val));
+				}
 				else
 				{
 					ft_putstr_fd(tmp1[0], 2);
 					ft_putendl_fd(": Permission denied", 2);
 				}
 			}
-			else if (ft_strchr(tmp1[0], '/'))
+			if (ft_strchr(tmp1[0], '/'))
 			{
 				if (access(tmp1[0], X_OK) == 0)
-					execve(tmp1[0], tmp1, env);
+					execve(tmp1[0], tmp1, ft_env_change(*key_val));
 				else
 				{
 					ft_putstr_fd(tmp1[0], 2);

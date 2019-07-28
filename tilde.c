@@ -6,7 +6,7 @@
 /*   By: iel-bouh <iel-bouh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/12 13:23:33 by iel-bouh          #+#    #+#             */
-/*   Updated: 2019/07/19 19:20:40 by iel-bouh         ###   ########.fr       */
+/*   Updated: 2019/07/22 15:17:46 by iel-bouh         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,7 +87,6 @@ int		ft_search_dir(char *path, char *exec)
 {
 	DIR				*dirp;
 	struct dirent	*dp;
-	char			*tmp;
 
 	while (*path != '\0')
 	{

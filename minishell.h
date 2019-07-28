@@ -6,7 +6,7 @@
 /*   By: iel-bouh <iel-bouh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/08 18:50:35 by iel-bouh          #+#    #+#             */
-/*   Updated: 2019/07/18 14:37:25 by iel-bouh         ###   ########.fr       */
+/*   Updated: 2019/07/27 16:22:45 by iel-bouh         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ typedef	struct		s_env
 	struct s_env	*next;
 }					t_env;
 
-int					ft_launch(char **env, t_env *key_val);
+int					ft_launch(t_env *key_val);
 char				**ft_path_var(char **env);
 char				*ft_path_check(char **path, char *exec);
 int					ft_count(char *line, char c);
@@ -53,14 +53,15 @@ void				ft_list_env(t_env *key_val);
 int					ft_change_env(t_env **key_val, char *key, char *val);
 void				ft_unsetenv(t_env **key_val, char *key);
 void				ft_echo(char **str);
-int					ft_parce_exec(char *line, t_env **key_val, char **env);
+int					ft_parce_exec(char *line, t_env **key_val);
 void				ft_ctl_c(int sig);
 void				ft_ctl_d(int sig);
 char				*ft_value(t_env *key_val, char *key);
 char				**ft_path_split(char *path);
 char				**ft_path_var(char **env);
-void	ft_env_var(char **env, t_env **key_val);
-void	ft_free_key(t_env **key_val);
+void				ft_env_var(char **env, t_env **key_val);
+void				ft_free_key(t_env **key_val);
+char				**ft_env_change(t_env *key_val);
 
 
 #endif

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtin.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: iel-bouh <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: iel-bouh <iel-bouh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/13 15:20:40 by iel-bouh          #+#    #+#             */
-/*   Updated: 2019/07/15 20:05:14 by iel-bouh         ###   ########.fr       */
+/*   Updated: 2019/07/28 14:43:08 by iel-bouh         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,11 +52,30 @@ int		ft_builtin(char **tokens, t_env **key_val)
 
 void	ft_cd(char **tokens, t_env **key_val)
 {
-	ft_change_env(key_val, "OLDPWD", getcwd(NULL, 0));
-	if (tokens[1])
-		chdir(tokens[1]);
+	if (ft_strequ(tokens[1], "-"))
+	{
+		if (chdir(ft_value(*key_val, "OLDPWD")) == -1)
+			ft_putendl("cd: No such file or directory");
+		ft_change_env(key_val, "OLDPWD", ft_value(*key_val ,"PWD"));
+	}
+	else if (tokens[1])
+	{
+		ft_change_env(key_val, "OLDPWD", getcwd(NULL, 0)); // fix this shit stupido
+		if (chdir(tokens[1]) == -1)
+		{
+			ft_putstr("cd: No such file or directory: ");
+			ft_putendl(tokens[1]);
+		}
+	}
 	else
-		chdir("/");
+	{
+		ft_change_env(key_val, "OLDPWD", getcwd(NULL, 0)); // fix this shit stupido
+		if (chdir("/") == -1)
+		{
+			ft_putstr("cd: No such file or directory: ");
+			ft_putendl(tokens[1]);
+		}
+	}
 	ft_change_env(key_val, "PWD", getcwd(NULL, 0));
 }
 
@@ -89,7 +108,10 @@ int	ft_change_env(t_env **key_val, char *key, char *val)
 		if (ft_strequ(tmp->key, key))
 		{
 			ft_memdel((void **)&(tmp->value));
-			tmp->value = strdup(val);
+			if (val)
+				tmp->value = ft_strdup(val);
+			else
+				tmp->value = ft_strdup("\0");
 			return (1);
 		}
 		tmp = tmp->next;
