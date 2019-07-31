@@ -6,7 +6,7 @@
 /*   By: iel-bouh <iel-bouh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/08 18:50:35 by iel-bouh          #+#    #+#             */
-/*   Updated: 2019/07/27 16:22:45 by iel-bouh         ###   ########.fr       */
+/*   Updated: 2019/07/31 17:23:13 by iel-bouh         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 # include <stdio.h>
 # include <sys/wait.h>
 # include <sys/types.h>
+# include <sys/stat.h>
 # include <dirent.h>
 # include <signal.h>
 # include "libft/libft.h"

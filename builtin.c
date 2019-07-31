@@ -6,7 +6,7 @@
 /*   By: iel-bouh <iel-bouh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/13 15:20:40 by iel-bouh          #+#    #+#             */
-/*   Updated: 2019/07/28 14:43:08 by iel-bouh         ###   ########.fr       */
+/*   Updated: 2019/07/31 18:24:00 by iel-bouh         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,29 +52,48 @@ int		ft_builtin(char **tokens, t_env **key_val)
 
 void	ft_cd(char **tokens, t_env **key_val)
 {
-	if (ft_strequ(tokens[1], "-"))
+	struct stat buf;
+	int	i;
+
+	i = 1;
+	while (tokens[i])
 	{
-		if (chdir(ft_value(*key_val, "OLDPWD")) == -1)
-			ft_putendl("cd: No such file or directory");
+		if (i > 1)
+		{
+			ft_putstr("cd: string not in pwd: ");
+			ft_putendl(tokens[1]);
+			return ;
+		}
+		i++;
+	}
+	if (i == 1)
+	{
+		ft_change_env(key_val, "OLDPWD", getcwd(NULL, 0));
+		chdir(ft_value(*key_val ,"HOME"));
+	}
+	else if (ft_strequ(tokens[1], "-"))
+	{
+		chdir(ft_value(*key_val, "OLDPWD"));
 		ft_change_env(key_val, "OLDPWD", ft_value(*key_val ,"PWD"));
 	}
-	else if (tokens[1])
+	else if (lstat(tokens[1], &buf) == 0)
 	{
-		ft_change_env(key_val, "OLDPWD", getcwd(NULL, 0)); // fix this shit stupido
-		if (chdir(tokens[1]) == -1)
+		if (S_ISDIR(buf.st_mode))
 		{
-			ft_putstr("cd: No such file or directory: ");
+			ft_change_env(key_val, "OLDPWD", getcwd(NULL, 0));
+			chdir(tokens[1]);
+		}
+		else
+		{
+			ft_putstr("cd : not a directory: ");
 			ft_putendl(tokens[1]);
 		}
 	}
 	else
 	{
-		ft_change_env(key_val, "OLDPWD", getcwd(NULL, 0)); // fix this shit stupido
-		if (chdir("/") == -1)
-		{
-			ft_putstr("cd: No such file or directory: ");
-			ft_putendl(tokens[1]);
-		}
+		ft_putstr("cd: no such file or directory: ");
+		ft_putendl(tokens[1]);
+		return ;
 	}
 	ft_change_env(key_val, "PWD", getcwd(NULL, 0));
 }

@@ -6,13 +6,13 @@
 /*   By: iel-bouh <iel-bouh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/09 20:16:03 by iel-bouh          #+#    #+#             */
-/*   Updated: 2019/07/19 19:30:20 by iel-bouh         ###   ########.fr       */
+/*   Updated: 2019/07/31 04:04:43 by iel-bouh         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int	ft_check_quote(char *lines)
+/*int	ft_check_quote(char *lines)
 {
 	int		i;
 
@@ -73,7 +73,7 @@ int	ft_split_quote(char **line)
 		ft_putendl("quote error");
 		return (-1);
 	}
-}
+}*/
 
 void	ft_expand(char **token, t_env *key_val)
 {

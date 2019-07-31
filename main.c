@@ -6,7 +6,7 @@
 /*   By: iel-bouh <iel-bouh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/05 14:51:08 by iel-bouh          #+#    #+#             */
-/*   Updated: 2019/07/28 19:37:50 by iel-bouh         ###   ########.fr       */
+/*   Updated: 2019/07/31 04:01:43 by iel-bouh         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -154,9 +154,8 @@ int		ft_parce_exec(char *line, t_env **key_val)
 	int		build;
 	char	*path;
 
-	if (ft_split_quote(&line) == -1)
-		return (0);
-	tmp1 = ft_strsplit(line, '1');
+	line = ft_strtrim(line);
+	tmp1 = ft_strsplit(line, ' ');
 	ft_expand(tmp1, *key_val);
 	if ((build = ft_builtin(tmp1, key_val)) == 1)
 	{
