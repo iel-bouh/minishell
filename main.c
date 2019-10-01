@@ -6,7 +6,7 @@
 /*   By: iel-bouh <iel-bouh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/05 14:51:08 by iel-bouh          #+#    #+#             */
-/*   Updated: 2019/07/31 04:01:43 by iel-bouh         ###   ########.fr       */
+/*   Updated: 2019/09/30 14:48:09 by iel-bouh         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,89 +26,41 @@ int		main(int argc, char **argv, char **env)
 	if (!ft_launch(key_val))
 	{
 		ft_putstr_fd("\033[0m", 1);
+		ft_free_key(&key_val);
 		return (0);
 	}
-	ft_free_key(&key_val);
 	ft_putstr_fd("\033[0m", 1);
+	ft_free_key(&key_val);
 	return (0);
-
 }
 
-void	ft_ctl_c(int sig)
-{
-	signal(SIGINT, ft_ctl_c);
-	if (g_ctl != 2)
-	{
-		ft_putstr_fd("\033[1;33m", 1);
-		ft_putstr_fd("\n$", 1);
-		ft_putstr_fd(getcwd(NULL, 0), 1);
-		ft_putstr_fd("> ", 1);
-		ft_putstr_fd("\033[0;32m", 1);
-	}
-	g_ctl = 1;
-	sig = g_ctl;
-}
-
-int	ft_launch(t_env *key_val)
+int		ft_launch(t_env *key_val)
 {
 	char	*line;
-	char	**command;
-	char	**cmd_tmp;
-	int		ch;
+	int		size;
+	char	*tmp_line;
 
 	while (1)
 	{
-		if (g_ctl == 0)
+		(g_ctl == 0) ? ft_prompot() : (g_ctl = 1);
+		line = (char *)malloc(sizeof(char) * 1024);
+		size = read(0, line, 1024);
+		line[size] = '\0';
+		tmp_line = ft_strtrim(line);
+		ft_memdel((void **)&line);
+		line = tmp_line;
+		if (size > 1)
 		{
-			ft_putstr_fd("\033[1;33m", 1);
-			ft_putstr_fd("$", 1);
-			ft_putstr_fd(getcwd(NULL, 0), 1);
-			ft_putstr_fd("> ", 1);
-			ft_putstr_fd("\033[0;32m", 1);
+			if (ft_launch_command(line, key_val) == 0)
+				return (0);
 		}
-		ch = get_next_line(1, &line); //freee it 
-		if (ch)
-		{
-			command = ft_strsplit(line, ';');
-			cmd_tmp = command;
-			while (*command)
-			{
-				if (!ft_parce_exec(*command++, &key_val))
-				{
-					ft_memdel((void **)&line);
-					while (*cmd_tmp)
-						free(*(cmd_tmp++));
-					return (0);
-				}
-			}
-		}
-		else
+		else if (size == 0)
 		{
 			ft_putendl("logout");
 			exit(0);
 		}
 		g_ctl = 0;
 	}
-}
-
-char	**ft_path_var(char **env)
-{
-	char *path;
-	char **bin_path;
-	char *tmp;
-
-	while (*env != NULL)
-	{
-		if ((path = ft_strstr(*env, "PATH")))
-		{
-			tmp = ft_strchr(path, '=');
-			path = tmp + 1;
-			bin_path = ft_strsplit(path, ':');
-			return (bin_path);
-		}
-		env++;
-	}
-	return (NULL);
 }
 
 char	**ft_path_split(char *path)
@@ -129,78 +81,52 @@ char	*ft_path_check(char **path, char *exec)
 	struct dirent	*dp;
 	char			*tmp;
 
-	while (*path)
+	if (path)
 	{
-		dirp = opendir(*path);
-		if (dirp == NULL)
-			return (NULL);
-		while ((dp = readdir(dirp)))
+		while (*path != NULL)
 		{
-			if (ft_strequ(dp->d_name, exec))
+			dirp = opendir(*path);
+			if (dirp == NULL)
+				return (NULL);
+			while ((dp = readdir(dirp)))
 			{
-				tmp = ft_strjoin(*path, "/");
-				return (tmp);
+				if (ft_strequ(dp->d_name, exec))
+				{
+					tmp = ft_strjoin(*path, "/");
+					closedir(dirp);
+					return (tmp);
+				}
 			}
+			closedir(dirp);
+			path++;
 		}
-		path++;
 	}
 	return (NULL);
 }
 
-int		ft_parce_exec(char *line, t_env **key_val)
+int		ft_launch_command(char *line, t_env *key_val)
 {
-	pid_t	pid;
-	char	**tmp1;
-	int		build;
-	char	*path;
+	int		i;
+	char	**command;
+	char	**cmd_tmp;
 
-	line = ft_strtrim(line);
-	tmp1 = ft_strsplit(line, ' ');
-	ft_expand(tmp1, *key_val);
-	if ((build = ft_builtin(tmp1, key_val)) == 1)
+	i = 0;
+	command = ft_strsplit(line, ';');
+	ft_memdel((void **)&line);
+	cmd_tmp = command;
+	while (*cmd_tmp)
 	{
-		g_ctl = 2;
-		pid = fork();
-		if (pid < 0)
-			perror("error: ");
-		if (pid == 0)
+		if (!ft_parce_exec(*cmd_tmp++, &key_val))
 		{
-			if (!ft_strchr(tmp1[0], '/') &&
-					(path = ft_path_check(ft_path_split(
-						ft_value(*key_val, "PATH")), tmp1[0])))
+			while (command[i])
 			{
-				tmp1[0] = ft_strjoin(path, tmp1[0]);
-				if (access(tmp1[0], X_OK) == 0)
-				{
-					execve(tmp1[0], tmp1, ft_env_change(*key_val));
-				}
-				else
-				{
-					ft_putstr_fd(tmp1[0], 2);
-					ft_putendl_fd(": Permission denied", 2);
-				}
+				free(command[i]);
+				i++;
 			}
-			if (ft_strchr(tmp1[0], '/'))
-			{
-				if (access(tmp1[0], X_OK) == 0)
-					execve(tmp1[0], tmp1, ft_env_change(*key_val));
-				else
-				{
-					ft_putstr_fd(tmp1[0], 2);
-					ft_putendl_fd(": Permission denied", 2);
-				}
-			}
-			else if (!path)
-			{
-				ft_putstr_fd("-bash: ", 2);
-				ft_putstr_fd(tmp1[0], 2);
-				ft_putstr_fd(": command not found\n", 2);
-			}
-			exit(0);
+			free(command);
+			return (0);
 		}
 	}
-	else if (build == 2)
-		return (0);
-	wait(0);
+	ft_free_tab(command);
 	return (1);
 }

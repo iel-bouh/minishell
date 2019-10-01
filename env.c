@@ -6,13 +6,13 @@
 /*   By: iel-bouh <iel-bouh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/11 16:37:11 by iel-bouh          #+#    #+#             */
-/*   Updated: 2019/07/28 19:24:57 by iel-bouh         ###   ########.fr       */
+/*   Updated: 2019/09/29 18:34:32 by iel-bouh         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int		ft_add_path(char **lines, t_env **key_val)
+int		ft_add_path(char *line1, char *line2, t_env **key_val)
 {
 	t_env *element;
 	t_env *tmp;
@@ -20,8 +20,11 @@ int		ft_add_path(char **lines, t_env **key_val)
 	element = (t_env *)malloc(sizeof(t_env));
 	if (!element)
 		return (0);
-	element->key = ft_strdup(*(lines++));
-	element->value = ft_strdup(*lines);
+	element->key = ft_strdup(line1);
+	if (line2)
+		element->value = ft_strdup(line2);
+	else
+		element->value = NULL;
 	element->next = NULL;
 	tmp = *key_val;
 	if (!(*key_val))
@@ -42,9 +45,8 @@ void	ft_env_var(char **env, t_env **key_val)
 	while (*env)
 	{
 		tmp = ft_strsplit(*env, '=');
-		ft_add_path(tmp, key_val);
-		while (*tmp)
-			free(*(tmp++));
+		ft_add_path(tmp[0], tmp[1], key_val);
+		ft_free_tab(tmp);
 		env++;
 	}
 }
@@ -55,7 +57,10 @@ void	ft_put_env(t_env *env)
 	{
 		ft_putstr(env->key);
 		ft_putchar('=');
-		ft_putendl(env->value);
+		if (env->value)
+			ft_putendl(env->value);
+		else
+			ft_putchar('\n');
 		env = env->next;
 	}
 }
@@ -76,8 +81,10 @@ char	**ft_env_change(t_env *key_val)
 	char	**env_tmp;
 	t_env	*tmp;
 	int		len;
-	char	**tmp1;
+	char	*fr;
+	int		i;
 
+	i = 0;
 	len = 0;
 	tmp = key_val;
 	while (tmp)
@@ -87,15 +94,13 @@ char	**ft_env_change(t_env *key_val)
 	}
 	if (!(env_tmp = (char **)malloc(sizeof(char *) * (len + 1))))
 		return (NULL);
-	tmp1 = env_tmp;
 	while (key_val)
 	{
-		char *fr = ft_strjoin(key_val->key, "=");
-		*env_tmp = ft_strjoin(fr, key_val->value);
+		fr = ft_strjoin(key_val->key, "=");
+		env_tmp[i++] = ft_strjoin(fr, key_val->value);
 		free(fr);
-		env_tmp++;
 		key_val = key_val->next;
 	}
-	env_tmp = NULL;
-	return (tmp1);
+	env_tmp[i] = NULL;
+	return (env_tmp);
 }

@@ -6,7 +6,7 @@
 /*   By: iel-bouh <iel-bouh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/09 20:16:03 by iel-bouh          #+#    #+#             */
-/*   Updated: 2019/07/31 04:04:43 by iel-bouh         ###   ########.fr       */
+/*   Updated: 2019/09/29 18:48:30 by iel-bouh         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,8 +41,9 @@ int	ft_count(char *line, char c)
 	}
 	return (i);
 }
+*/
 
-int	ft_split_quote(char **line)
+int		ft_split_quote(char **line)
 {
 	int		i;
 	int		j;
@@ -50,34 +51,25 @@ int	ft_split_quote(char **line)
 
 	i = 0;
 	j = 0;
-	if (ft_check_quote(*line) == 1)
+	while ((**line == ' ' || **line == '\t') && **line != '\0')
+		(*line)++;
+	tmp = *line;
+	while (*tmp != '\0')
 	{
-		while ((**line == ' ' || **line == '\t') && **line != '\0')
-			(*line)++;
-		tmp = *line;
-		while (*tmp != '\0')
-		{
-			if (*tmp == '"')
-				i++;
-			else if (*tmp == '\'')
-				j++;
-			else if ((*tmp == ' ' || *tmp == '\t')
-						&& ((i % 2) == 0 && (j % 2) == 0))
-				*tmp = '1';
-			tmp++;
-		}
-		return (1);
+		if (*tmp == '"')
+			i++;
+		else if (*tmp == '\'')
+			j++;
+		else if ((*tmp == ' ' || *tmp == '\t')
+					&& ((i % 2) == 0 && (j % 2) == 0))
+			*tmp = -1;
+		tmp++;
 	}
-	else
-	{
-		ft_putendl("quote error");
-		return (-1);
-	}
-}*/
+	return (1);
+}
 
 void	ft_expand(char **token, t_env *key_val)
 {
-
 	while (*token)
 	{
 		ft_tilde(token, key_val);
@@ -126,7 +118,7 @@ void	ft_expand(char **token, t_env *key_val)
 	*token = cp;
 }*/
 
-char ft_first(char *str)
+char	ft_first(char *str)
 {
 	while (*str)
 	{
@@ -141,19 +133,36 @@ char ft_first(char *str)
 
 void	ft_rm_quote(char **token)
 {
-	char **tmp;
+	char	**split;
+	char	*tmp;
+	int		i;
 
-
-	tmp = ft_strsplit(*token, ft_first(*token));
+	i = 0;
+	split = ft_strsplit(*token, ft_first(*token));
 	ft_memdel((void **)&(*token));
-	while (*tmp)
+	while (split[i])
 	{
 		if (*token)
-			*token = ft_strjoin(*token, *tmp);
+		{
+			tmp = ft_strjoin(*token, split[i++]);
+			ft_memdel((void **)&(*token));
+			*token = tmp;
+			ft_memdel((void **)&tmp);
+		}
 		else
-			*token = ft_strdup(*tmp);
-		tmp++;
+			*token = ft_strdup(split[i++]);
 	}
-
+	ft_free_tab(split);
 }
 
+void	ft_dolar(char **str, t_env *key_val)
+{
+	char *tmp;
+
+	tmp = *str;
+	while (*tmp != '\0')
+	{
+		ft_find_expand(tmp, key_val, str);
+		tmp++;
+	}
+}
