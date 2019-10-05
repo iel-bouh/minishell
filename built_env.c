@@ -6,7 +6,7 @@
 /*   By: iel-bouh <iel-bouh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/09/29 18:32:12 by iel-bouh          #+#    #+#             */
-/*   Updated: 2019/09/29 18:34:27 by iel-bouh         ###   ########.fr       */
+/*   Updated: 2019/10/04 13:32:01 by iel-bouh         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,10 +58,16 @@ void	ft_unsetenv(t_env **key_val, char *key)
 	t_env *tmp_prev;
 
 	tmp = *key_val;
+	tmp_prev = NULL;
 	while (tmp)
 	{
 		if (ft_strequ(tmp->key, key))
 		{
+			if (tmp_prev == NULL)
+			{
+				ft_free_head(key_val);
+				return ;
+			}
 			tmp_prev->next = tmp->next;
 			ft_memdel((void **)&(tmp->value));
 			ft_memdel((void **)&(tmp->key));
@@ -71,4 +77,16 @@ void	ft_unsetenv(t_env **key_val, char *key)
 		tmp_prev = tmp;
 		tmp = tmp->next;
 	}
+}
+
+void	ft_free_head(t_env **key_val)
+{
+	t_env *tmp;
+
+	tmp = *key_val;
+
+	*key_val = (*key_val)->next;
+	ft_memdel((void **)&(tmp->value));
+	ft_memdel((void **)&(tmp->key));
+	free(tmp);
 }

@@ -6,7 +6,7 @@
 /*   By: iel-bouh <iel-bouh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/09/24 15:00:50 by iel-bouh          #+#    #+#             */
-/*   Updated: 2019/09/30 14:38:39 by iel-bouh         ###   ########.fr       */
+/*   Updated: 2019/10/04 13:11:56 by iel-bouh         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,7 +99,7 @@ char	**ft_command_expand(char *line, t_env **key_val)
 	ft_split_quote(&line_tmp);
 	token = ft_strsplit(line_tmp, -1);
 	ft_memdel((void **)&line_tmp);
-	ft_expand(token, *key_val);
+	ft_expand(&(token[1]), *key_val);
 	return (token);
 }
 

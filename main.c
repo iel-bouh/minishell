@@ -6,7 +6,7 @@
 /*   By: iel-bouh <iel-bouh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/05 14:51:08 by iel-bouh          #+#    #+#             */
-/*   Updated: 2019/09/30 14:48:09 by iel-bouh         ###   ########.fr       */
+/*   Updated: 2019/10/04 13:32:39 by iel-bouh         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ int		main(int argc, char **argv, char **env)
 	argc = 0;
 	signal(SIGINT, ft_ctl_c);
 	ft_env_var(env, &key_val);
-	if (!ft_launch(key_val))
+	if (!ft_launch(&key_val))
 	{
 		ft_putstr_fd("\033[0m", 1);
 		ft_free_key(&key_val);
@@ -34,7 +34,7 @@ int		main(int argc, char **argv, char **env)
 	return (0);
 }
 
-int		ft_launch(t_env *key_val)
+int		ft_launch(t_env **key_val)
 {
 	char	*line;
 	int		size;
@@ -104,7 +104,7 @@ char	*ft_path_check(char **path, char *exec)
 	return (NULL);
 }
 
-int		ft_launch_command(char *line, t_env *key_val)
+int		ft_launch_command(char *line, t_env **key_val)
 {
 	int		i;
 	char	**command;
@@ -116,7 +116,7 @@ int		ft_launch_command(char *line, t_env *key_val)
 	cmd_tmp = command;
 	while (*cmd_tmp)
 	{
-		if (!ft_parce_exec(*cmd_tmp++, &key_val))
+		if (!ft_parce_exec(*cmd_tmp++, key_val))
 		{
 			while (command[i])
 			{
