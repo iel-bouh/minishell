@@ -6,27 +6,11 @@
 /*   By: iel-bouh <iel-bouh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/12 13:23:33 by iel-bouh          #+#    #+#             */
-/*   Updated: 2019/10/04 11:46:43 by iel-bouh         ###   ########.fr       */
+/*   Updated: 2019/10/16 11:09:18 by iel-bouh         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-
-int		ft_prefix_search(char **str)
-{
-	int	i;
-	int	j;
-
-	i = 0;
-	j = 0;
-	if (**str == '"')
-		i++;
-	else if (**str == '\'')
-		j++;
-	else if (**str == '/' && ((i % 2) == 0 && (j % 2) == 0))
-		return (1);
-	return (0);
-}
 
 char	*ft_prefix(char **str)
 {
@@ -40,7 +24,7 @@ char	*ft_prefix(char **str)
 		tmp = *str;
 		while (**str != '\0')
 		{
-			if (ft_prefix_search(str) == 1)
+			if (**str == '/')
 				break ;
 			count++;
 			(*str)++;
@@ -84,16 +68,12 @@ int		ft_prefix_join(char *prefix, char **str, char *tmp)
 {
 	char *join_tmp;
 
-	if (!ft_chr_exist(prefix, '"') && !ft_chr_exist(prefix, '\''))
+	if (ft_search_dir("/Users", prefix))
 	{
-		if (ft_search_dir("/Users", prefix))
-		{
-			ft_memdel((void **)str);
-			join_tmp = ft_strjoin(prefix, tmp);
-			*str = ft_strjoin("/Users/", join_tmp);
-			ft_memdel((void **)&join_tmp);
-			return (1);
-		}
+		ft_memdel((void **)str);
+		join_tmp = ft_strjoin(prefix, tmp);
+		*str = ft_strjoin("/Users/", join_tmp);
+		ft_memdel((void **)&join_tmp);
 		return (1);
 	}
 	return (0);

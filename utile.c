@@ -6,7 +6,7 @@
 /*   By: iel-bouh <iel-bouh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/09/30 14:27:10 by iel-bouh          #+#    #+#             */
-/*   Updated: 2019/09/30 15:01:05 by iel-bouh         ###   ########.fr       */
+/*   Updated: 2019/10/16 11:09:26 by iel-bouh         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,4 +60,16 @@ int		ft_chr_exist(char *str, char c)
 		str++;
 	}
 	return (0);
+}
+
+char	**ft_path_split(char *path)
+{
+	char **bin_path;
+
+	if (path)
+	{
+		bin_path = ft_strsplit(path, ':');
+		return (bin_path);
+	}
+	return (NULL);
 }

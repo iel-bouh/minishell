@@ -6,34 +6,11 @@
 /*   By: iel-bouh <iel-bouh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/09/24 15:00:50 by iel-bouh          #+#    #+#             */
-/*   Updated: 2019/10/04 13:11:56 by iel-bouh         ###   ########.fr       */
+/*   Updated: 2019/10/16 11:08:42 by iel-bouh         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-
-int		ft_parce_exec(char *line, t_env **key_val)
-{
-	char	**token;
-	int		build;
-
-	token = ft_command_expand(line, key_val);
-	if ((build = ft_builtin(token, key_val)) == 1)
-	{
-		if (ft_path_bin(token, key_val) == 1)
-		{
-			return (1);
-		}
-	}
-	else if (build == 2)
-	{
-		ft_free_tab(token);
-		return (0);
-	}
-	else
-		ft_free_tab(token);
-	return (1);
-}
 
 void	ft_path_exec(char **token, t_env **key_val)
 {
@@ -56,7 +33,7 @@ void	ft_path_exec(char **token, t_env **key_val)
 	else
 	{
 		ft_putstr_fd(token[0], 2);
-		ft_putendl_fd(": Permission denied", 2);
+		ft_putendl_fd(": no Permission or don't exist", 2);
 	}
 	ft_free_tab(token);
 }
@@ -90,19 +67,6 @@ void	ft_bin_exec(char **token, char *path, t_env **key_val)
 	ft_free_tab(token);
 }
 
-char	**ft_command_expand(char *line, t_env **key_val)
-{
-	char	**token;
-	char	*line_tmp;
-
-	line_tmp = ft_strtrim(line);
-	ft_split_quote(&line_tmp);
-	token = ft_strsplit(line_tmp, -1);
-	ft_memdel((void **)&line_tmp);
-	ft_expand(&(token[1]), *key_val);
-	return (token);
-}
-
 int		ft_path_bin(char **token, t_env **key_val)
 {
 	char	*path;
@@ -128,4 +92,40 @@ int		ft_path_bin(char **token, t_env **key_val)
 	ft_free_tab(path_tmp);
 	wait(0);
 	return (0);
+}
+
+char	**ft_command_expand(char *line, t_env **key_val)
+{
+	char	**token;
+	char	*line_tmp;
+
+	line_tmp = ft_strtrim(line);
+	ft_split_quote(&line_tmp);
+	token = ft_strsplit(line_tmp, -1);
+	ft_memdel((void **)&line_tmp);
+	ft_expand(&(token[1]), *key_val);
+	return (token);
+}
+
+int		ft_parce_exec(char *line, t_env **key_val)
+{
+	char	**token;
+	int		build;
+
+	token = ft_command_expand(line, key_val);
+	if ((build = ft_builtin(token, key_val)) == 1)
+	{
+		if (ft_path_bin(token, key_val) == 1)
+		{
+			return (1);
+		}
+	}
+	else if (build == 2)
+	{
+		ft_free_tab(token);
+		return (0);
+	}
+	else
+		ft_free_tab(token);
+	return (1);
 }

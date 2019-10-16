@@ -6,7 +6,7 @@
 /*   By: iel-bouh <iel-bouh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/09 20:16:03 by iel-bouh          #+#    #+#             */
-/*   Updated: 2019/10/02 11:21:11 by iel-bouh         ###   ########.fr       */
+/*   Updated: 2019/10/16 11:08:46 by iel-bouh         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,17 +35,6 @@ int		ft_split_quote(char **line)
 		tmp++;
 	}
 	return (1);
-}
-
-void	ft_expand(char **token, t_env *key_val)
-{
-	while (*token)
-	{
-		ft_tilde(token, key_val);
-		ft_dolar(token, key_val);
-		ft_rm_quote(token);
-		token++;
-	}
 }
 
 char	ft_first(char *str)
@@ -87,12 +76,30 @@ void	ft_rm_quote(char **token)
 
 void	ft_dolar(char **str, t_env *key_val)
 {
-	char *tmp;
+	char	*tmp;
+	int		count;
 
+	count = 0;
 	tmp = *str;
 	while (*tmp != '\0')
 	{
-		ft_find_expand(tmp, key_val, str);
+		if (*tmp == '$')
+		{
+			ft_extract_expand(str, ++tmp, key_val, count);
+			tmp = *str;
+		}
 		tmp++;
+		count++;
+	}
+}
+
+void	ft_expand(char **token, t_env *key_val)
+{
+	while (*token)
+	{
+		ft_tilde(token, key_val);
+		ft_dolar(token, key_val);
+		ft_rm_quote(token);
+		token++;
 	}
 }

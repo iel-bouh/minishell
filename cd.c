@@ -6,7 +6,7 @@
 /*   By: iel-bouh <iel-bouh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/09/27 15:42:55 by iel-bouh          #+#    #+#             */
-/*   Updated: 2019/09/29 18:34:36 by iel-bouh         ###   ########.fr       */
+/*   Updated: 2019/10/16 11:07:53 by iel-bouh         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,10 @@ void	ft_cd_old(t_env **key_val)
 	char *tmp_pwd1;
 
 	if (ft_value(*key_val, "OLDPWD") == NULL)
+	{
+		ft_putstr_fd(" No such file or directory.\n", 2);
 		return ;
+	}
 	old_pwd = ft_strdup(ft_value(*key_val, "OLDPWD"));
 	tmp_pwd = getcwd(NULL, 0);
 	if (ft_change_env(key_val, "OLDPWD",
